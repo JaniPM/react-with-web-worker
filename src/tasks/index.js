@@ -3,7 +3,7 @@ import React from 'react'
 import TextField from 'material-ui/TextField'
 import Grid from 'material-ui/Grid'
 import DataGrid from 'components/table/DataGrid'
-import Schema from 'schemas/TasksTableSchema'
+import Schema from './TasksTableSchema'
 import DataGridWorker from 'worker-loader!web-workers/DataGridWorker'
 import {INIT_DATA, SORT, FILTER} from 'web-workers/WorkerMsg'
 
