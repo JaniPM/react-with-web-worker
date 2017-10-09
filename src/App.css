@@ -12,6 +12,11 @@
   color: white;
 }
 
+.app-timer {
+  color: white;
+  float: right;
+}
+
 .content {
   padding: 10px;
 }

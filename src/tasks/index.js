@@ -1,6 +1,7 @@
 import React from 'react'
 import TextField from 'material-ui/TextField'
 import Grid from 'material-ui/Grid'
+import Button from 'material-ui/Button'
 import DataGrid from 'components/table/DataGrid'
 import Schema from './TasksTableSchema'
 import InitData from 'utils/InitData'
@@ -22,6 +23,10 @@ class Tasks extends React.Component {
   }
 
   componentDidMount () {
+    this.loadData()
+  }
+
+  loadData () {
     const items = InitData(100000)
     this.setState({allItems: items, items: items})
   }
@@ -83,10 +88,15 @@ class Tasks extends React.Component {
 
     return (
       <Grid container spacing={24}>
-        <Grid item xs={4}>
+        <Grid item xs={10}>
           <TextField fullWidth label='Search'
             type='search'
             onChange={this.handleSearch} />
+        </Grid>
+        <Grid item xs={2}>
+          <Button raised color='primary' onClick={() => this.loadData()}>
+            Refresh data
+          </Button>
         </Grid>
         <Grid item xs={12}>
           <DataGrid items={items}
