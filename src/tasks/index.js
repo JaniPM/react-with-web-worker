@@ -1,11 +1,11 @@
-/* eslint import/no-webpack-loader-syntax: 0 */
 import React from 'react'
 import TextField from 'material-ui/TextField'
 import Grid from 'material-ui/Grid'
 import DataGrid from 'components/table/DataGrid'
 import Schema from './TasksTableSchema'
-import DataGridWorker from 'worker-loader!web-workers/DataGridWorker'
-import {INIT_DATA, SORT, FILTER} from 'web-workers/WorkerMsg'
+import InitData from 'utils/InitData'
+import Filter from 'utils/Filter'
+import Sort from 'utils/Sort'
 
 class Tasks extends React.Component {
   constructor (props) {
@@ -19,10 +19,11 @@ class Tasks extends React.Component {
       orderBy: null,
       order: null
     }
+  }
 
-    this.worker = new DataGridWorker()
-    this.worker.onmessage = this.handleWorkerResponse
-    this.worker.postMessage({type: INIT_DATA})
+  componentDidMount () {
+    const items = InitData(100000)
+    this.setState({allItems: items, items: items})
   }
 
   handleSelectAllClick = (event, checked) => {
@@ -65,36 +66,16 @@ class Tasks extends React.Component {
       order = 'asc'
     }
 
-    this.worker.postMessage({
-      type: SORT, items: this.state.allItems, orderBy: orderBy, order: order
-    })
+    const items = Sort(this.state.items, orderBy, order)
 
-    this.setState({order, orderBy})
+    this.setState({items, order, orderBy})
   }
 
   handleSearch = (event) => {
     const searchValue = event.target.value
+    const items = Filter(this.state.allItems, searchValue)
 
-    this.worker.postMessage({
-      type: FILTER, searchValue: searchValue, items: this.state.allItems
-    })
-  }
-
-  handleWorkerResponse = (msg) => {
-    const data = msg.data
-
-    switch (data.type) {
-      case INIT_DATA:
-        this.setState({allItems: data.items, items: data.items})
-        break;
-      case FILTER:
-      case SORT:
-        this.setState({items: data.items})
-        break;
-      default:
-        console.log('Unknown msg in worker response')
-        break;
-    }
+    this.setState({items})
   }
 
   render () {
