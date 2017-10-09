@@ -1,12 +1,9 @@
+/* eslint import/no-webpack-loader-syntax: 0 */
 import React from 'react'
 import TextField from 'material-ui/TextField'
 import Grid from 'material-ui/Grid'
 import DataGrid from 'components/table/DataGrid'
 import Schema from 'schemas/TasksTableSchema'
-// import Sort from 'utils/Sort'
-// import Filter from 'utils/Filter'
-
-/* eslint import/no-webpack-loader-syntax: 0 */
 import DataGridWorker from 'worker-loader!web-workers/DataGridWorker'
 import {INIT_DATA, SORT, FILTER} from 'web-workers/WorkerMsg'
 
