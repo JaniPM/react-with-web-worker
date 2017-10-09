@@ -1,49 +1,42 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Table, {
-  TableBody,
-  TableRow,
-  TableCell
-} from 'material-ui/Table'
-import Checkbox from 'material-ui/Checkbox'
+import Table from 'material-ui/Table'
+import ReactList from 'react-list'
+import DataGridRow from './DataGridRow'
 import SortableTableHead from './SortableTableHead'
 
 const DataGrid = props => {
-  const {items, columns, isSelected, onSelectClick} = props
+  const {items} = props
 
-  const createSelectHandler = id => event => onSelectClick(id)
+  const renderRow = (index, key) => {
+    return <DataGridRow key={key} item={items[index]} {...props} />;
+  }
+
+  const renderTable = (renderedItems, ref) => {
+    return (
+      <Table>
+        <SortableTableHead {...props} />
+        <tbody ref={ref}>{renderedItems}</tbody>
+      </Table>
+    )
+  }
 
   return (
-    <Table>
-      <SortableTableHead {...props} />
-      <TableBody>
-        {items.map(item =>
-          <TableRow key={item.id} selected={isSelected(item.id)}>
-            <TableCell checkbox onClick={createSelectHandler(item.id)}>
-              <Checkbox checked={isSelected(item.id)} />
-            </TableCell>
-            {columns.map(column =>
-              <TableCell key={column.property}>{item[column.property]}</TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <ReactList
+      itemsRenderer={renderTable}
+      itemRenderer={renderRow}
+      length={items.length}
+      type='uniform'
+    />
   )
 }
 
 DataGrid.propTypes = {
-  sortColumn: PropTypes.string,
-  items: PropTypes.array,
-  columns: PropTypes.array,
-  isSelected: PropTypes.func.isRequired,
-  onSelectClick: PropTypes.func.isRequired
+  items: PropTypes.array
 }
 
 DataGrid.defaultProps = {
-  columns: [],
-  items: [],
-  sortColumn: ''
+  items: []
 }
 
 export default DataGrid

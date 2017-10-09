@@ -3,17 +3,18 @@ import TextField from 'material-ui/TextField'
 import Grid from 'material-ui/Grid'
 import DataGrid from 'components/table/DataGrid'
 import Schema from 'schemas/TasksTableSchema'
+// import Sort from 'utils/Sort'
 // import Filter from 'utils/Filter'
 
 /* eslint import/no-webpack-loader-syntax: 0 */
-import FilterWorker from 'worker-loader!web-workers/filterWorker'
+import DataGridWorker from 'worker-loader!web-workers/DataGridWorker'
+import {INIT_DATA, SORT, FILTER} from 'web-workers/WorkerMsg'
 
 class Tasks extends React.Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      open: false,
       allItems: [],
       items: [],
       selected: [],
@@ -22,9 +23,9 @@ class Tasks extends React.Component {
       order: null
     }
 
-    this.worker = new FilterWorker()
+    this.worker = new DataGridWorker()
     this.worker.onmessage = this.handleWorkerResponse
-    this.worker.postMessage({type: 'init-data'})
+    this.worker.postMessage({type: INIT_DATA})
   }
 
   handleSelectAllClick = (event, checked) => {
@@ -33,6 +34,11 @@ class Tasks extends React.Component {
       return
     }
     this.setState({ selected: [] })
+  }
+
+  isSelected = id => {
+    const {selected} = this.state
+    return selected.indexOf(id) > -1
   }
 
   handleSelectClick = id => {
@@ -56,42 +62,37 @@ class Tasks extends React.Component {
     this.setState({selected: newSelected})
   }
 
-  handleSort = (event, property) => {
-    const orderBy = property
+  handleSort = (event, orderBy) => {
     let order = 'desc'
-
-    if (this.state.orderBy === property && this.state.order === 'desc') {
+    if (this.state.orderBy === orderBy && this.state.order === 'desc') {
       order = 'asc'
     }
 
-    const items = this.state.items.sort(
-      (a, b) => (order === 'desc' ? b[orderBy] > a[orderBy] : a[orderBy] > b[orderBy])
-    )
+    this.worker.postMessage({
+      type: SORT, items: this.state.allItems, orderBy: orderBy, order: order
+    })
 
-    this.setState({items, order, orderBy})
+    this.setState({order, orderBy})
   }
 
   handleSearch = (event) => {
     const searchValue = event.target.value
-    console.log(searchValue)
 
     this.worker.postMessage({
-      type: 'filter', searchValue: searchValue, items: this.state.allItems
+      type: FILTER, searchValue: searchValue, items: this.state.allItems
     })
-
-    // const filteredItems = Filter(this.state.allItems, searchValue)
-    // this.setState({items: filteredItems})
   }
 
   handleWorkerResponse = (msg) => {
     const data = msg.data
 
     switch (data.type) {
-      case 'filter':
-        this.setState({items: data.items})
-        break;
-      case 'init-data':
+      case INIT_DATA:
         this.setState({allItems: data.items, items: data.items})
+        break;
+      case FILTER:
+      case SORT:
+        this.setState({items: data.items})
         break;
       default:
         console.log('Unknown msg in worker response')
@@ -99,18 +100,13 @@ class Tasks extends React.Component {
     }
   }
 
-  isSelected = id => {
-    const {selected} = this.state
-    return selected.indexOf(id) > -1
-  }
-
   render () {
     const {items, orderBy, order, selected} = this.state
 
     return (
       <Grid container spacing={24}>
-        <Grid item xs={12}>
-          <TextField label='Search'
+        <Grid item xs={4}>
+          <TextField fullWidth label='Search'
             type='search'
             onChange={this.handleSearch} />
         </Grid>

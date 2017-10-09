@@ -1,4 +1,4 @@
-const filter = (items, searchValue) => {
+function filter (items, searchValue) {
   return items.filter((item) => {
     for (let prop in item) {
       const value = item[prop]
@@ -11,7 +11,7 @@ const filter = (items, searchValue) => {
   })
 }
 
-const isMatch = (value, searchValue) => {
+function isMatch (value, searchValue) {
   const filterString = searchValue ? searchValue.toLowerCase() : ''
 
   if (value && typeof value === 'string') {
