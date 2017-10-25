@@ -2,6 +2,7 @@
 import React from 'react'
 import TextField from 'material-ui/TextField'
 import Grid from 'material-ui/Grid'
+import Button from 'material-ui/Button'
 import DataGrid from 'components/table/DataGrid'
 import Schema from './TasksTableSchema'
 import DataGridWorker from 'worker-loader!web-workers/DataGridWorker'
@@ -22,6 +23,13 @@ class Tasks extends React.Component {
 
     this.worker = new DataGridWorker()
     this.worker.onmessage = this.handleWorkerResponse
+  }
+
+  componentDidMount () {
+    this.loadData()
+  }
+
+  loadData () {
     this.worker.postMessage({type: INIT_DATA})
   }
 
@@ -102,10 +110,15 @@ class Tasks extends React.Component {
 
     return (
       <Grid container spacing={24}>
-        <Grid item xs={4}>
+        <Grid item xs={10}>
           <TextField fullWidth label='Search'
             type='search'
             onChange={this.handleSearch} />
+        </Grid>
+        <Grid item xs={2}>
+          <Button raised color='primary' onClick={() => this.loadData()}>
+            Refresh data
+          </Button>
         </Grid>
         <Grid item xs={12}>
           <DataGrid items={items}
