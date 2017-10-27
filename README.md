@@ -1,4 +1,4 @@
-Available Scripts
+Start app with
 - npm start
-- npm test
-- npm run build
+
+Change branch to no-web-worker in order to see the difference when there is no web workers.
