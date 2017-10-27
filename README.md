@@ -1,3 +1,6 @@
+Install the dependencies
+- npm i
+
 Start app with
 - npm start
 
